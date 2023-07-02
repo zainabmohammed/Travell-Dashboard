@@ -5,8 +5,14 @@
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-.container-trip {
+.app-container {
   max-width: 1150px;
   margin: auto;
   padding: 20px;
+}
+
+.app-flex-space{
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
 }

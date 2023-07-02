@@ -1,10 +1,22 @@
+import "antd/dist/reset.css";
 import "./App.css";
-import AboutTrip from "./component/About";
+import MainHeader from "./Components/Header";
+import BookinsTable from "./Components/BookingsTable";
+import TravelTable from "./Components/TravelTable";
+import { useAppStore } from "./appStore";
 
 function App() {
+  const { screen } = useAppStore();
+
+  const screens = {
+    Bookings: <BookinsTable />,
+    Travells: <TravelTable />,
+  };
+
   return (
-    <div>
-      <AboutTrip />
+    <div className="app-container">
+      <MainHeader />
+      {screens[screen]}
     </div>
   );
 }
