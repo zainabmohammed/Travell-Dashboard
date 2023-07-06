@@ -82,7 +82,7 @@ const TravelTable = () => {
         message.success("Create Succefulley!");
         setIsModalOpen(false);
         getTraveltable();
-        setAddLoading(true);
+        setAddLoading(false);
       })
       .catch((error) => {
         setAddLoading(false);
