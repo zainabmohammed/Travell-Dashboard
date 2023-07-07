@@ -1,23 +1,13 @@
 import "antd/dist/reset.css";
 import "./App.css";
-import MainHeader from "./Components/Header";
-import BookinsTable from "./Components/BookingsTable";
-import TravelTable from "./Components/TravelTable";
+
+import HomeScreen from "./Screens/HomeScreen";
+import LoginScreen from "./Screens/LoginScreen";
 import { useAppStore } from "./appStore";
 
 function App() {
-  const { screen } = useAppStore();
+  const { isLogin } = useAppStore();
 
-  const screens = {
-    Bookings: <BookinsTable />,
-    Travells: <TravelTable />,
-  };
-
-  return (
-    <div className="app-container">
-      <MainHeader />
-      {screens[screen]}
-    </div>
-  );
+  return isLogin ? <HomeScreen /> : <LoginScreen />;
 }
 export default App;
