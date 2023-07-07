@@ -188,7 +188,7 @@ const TravelTable = () => {
           </Button>
           </Popover>
           <Divider type="vertical" />
-          <Button size="small" icon={<EditOutlined />} />
+          <Button disabled size="small" icon={<EditOutlined />} />
           <Popconfirm
             title="Delete the task"
             description="Are you sure to delete this task?"
