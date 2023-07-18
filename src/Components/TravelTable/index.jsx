@@ -24,30 +24,7 @@ import {
 } from "@ant-design/icons";
 import "./style.css";
 import React, { useEffect, useState } from "react";
-
-const MyFormItemContext = React.createContext([]);
-function toArr(str) {
-  return Array.isArray(str) ? str : [str];
-}
-const MyFormItemGroup = ({ prefix, children }) => {
-  const prefixPath = React.useContext(MyFormItemContext);
-  const concatPath = React.useMemo(
-    () => [...prefixPath, ...toArr(prefix)],
-    [prefixPath, prefix]
-  );
-
-  return (
-    <MyFormItemContext.Provider value={concatPath}>
-      {children}
-    </MyFormItemContext.Provider>
-  );
-};
-const MyFormItem = ({ name, ...props }) => {
-  const prefixPath = React.useContext(MyFormItemContext);
-  const concatName =
-    name !== undefined ? [...prefixPath, ...toArr(name)] : undefined;
-  return <Form.Item name={concatName} {...props} />;
-};
+import dayjs from "dayjs";
 
 const TravelTable = () => {
   // const [currentIndex, setCurrentIndex] =useState(0)
@@ -55,7 +32,10 @@ const TravelTable = () => {
   const [loading, setLoading] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
   const showModal = () => {
+    form.resetFields()
     setIsModalOpen(true);
   };
   const handleOk = () => {
@@ -66,20 +46,27 @@ const TravelTable = () => {
   };
   const onFinish = (value) => {
     setAddLoading(true);
+    let id = form.getFieldValue("id");
     value.date = value.date.toString();
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify(value);
     var requestOptions = {
-      method: "POST",
+      method: id ? "PUT" : "POST",
       headers: myHeaders,
       body: raw,
     };
 
-    fetch("https://travel-api-cpil.onrender.com/api/trips", requestOptions)
+    fetch(
+      `https://travel-api-cpil.onrender.com/api/trips${
+        id ? `/${form.getFieldValue("id")}` : ""
+      }`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
-        message.success("Create Succefulley!");
+        if (id) message.success("Edit Succefulley!");
+        else message.success("Create Succefulley!");
         setIsModalOpen(false);
         getTraveltable();
         setAddLoading(false);
@@ -124,23 +111,6 @@ const TravelTable = () => {
       .catch((error) => console.log("error", error));
   };
 
-  // const dataSource = [
-  //   {
-  //     id: 1,
-  //     title: "سفرة الى الله",
-  //     place: "اربيل",
-  //     content: "هذا النص تجريبي ولايعتبر نص حقيقي فقط باوع واسكت",
-  //     price: 55000,
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "سفرة الى المريخ",
-  //     place: "المريخ",
-  //     content: "هذا النص تجريبي ولايعتبر نص حقيقي فقط باوع واسكت",
-  //     price: 150000,
-  //   },
-  // ];
-
   const columns = [
     {
       title: "#",
@@ -158,6 +128,11 @@ const TravelTable = () => {
       dataIndex: "place",
       key: "place",
       render: (place) => <Tag color="geekblue">{place}</Tag>,
+    },
+    {
+      title: "Days",
+      dataIndex: "days",
+      key: "days"
     },
     {
       title: "content",
@@ -181,26 +156,29 @@ const TravelTable = () => {
       key: "id",
       render: (id, row) => (
         <Space>
-          <Popover content={<img style={{width: 200}} src={row?.img}/>}>
-
-          <Button size="small" icon={<FileImageOutlined />}>
-            Image
-          </Button>
+          <Popover content={<img style={{ width: 200 }} src={row?.img} />}>
+            <Button size="small" icon={<FileImageOutlined />}>
+              Image
+            </Button>
           </Popover>
           <Divider type="vertical" />
-          <Button disabled size="small" icon={<EditOutlined />} />
+          <Button
+            onClick={() => {
+              row.date = dayjs(row.data);
+              form.setFieldsValue(row);
+              setIsModalOpen(true);
+            }}
+            size="small"
+            icon={<EditOutlined />}
+          />
           <Popconfirm
             title="Delete the task"
             description="Are you sure to delete this task?"
-            onConfirm={()=> deletTrip(id)}
+            onConfirm={() => deletTrip(id)}
             okText="Yes"
             cancelText="No"
           >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            />
+            <Button danger size="small" icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -222,7 +200,12 @@ const TravelTable = () => {
             onCancel={handleCancel}
             footer={null}
           >
-            <Form name="form_item_path" layout="vertical" onFinish={onFinish}>
+            <Form
+              form={form}
+              name="form_item_path"
+              layout="vertical"
+              onFinish={onFinish}
+            >
               <Row gutter={8}>
                 <Col span={14}>
                   <Form.Item name="title" label="Title">
