@@ -130,6 +130,15 @@ const TravelTable = () => {
       render: (place) => <Tag color="geekblue">{place}</Tag>,
     },
     {
+      title: "date",
+      dataIndex: "date",
+    
+      key: "date",
+     
+      render: (date
+        ) => <b>{dayjs(date).format(' YYYY-MM-DD') }</b>,
+    },
+    {
       title: "Days",
       dataIndex: "days",
       key: "days"
